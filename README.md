@@ -110,41 +110,41 @@ Download: [https://dqa.vn/devapps/](https://dqa.vn/devapps/)
 
 ### :keyboard: Navigation
 
-`
-Alt + Left/Right    Navigate back/forward
-Alt + Up            Go to parent folder
-Ctrl + K            Open palette
-F5                  Refresh
-`
+| Shortcut | Action |
+|----------|--------|
+| Alt + Left/Right | Navigate back/forward |
+| Alt + Up | Go to parent folder |
+| Ctrl + K | Open palette |
+| F5 | Refresh |
 
 ### :point_up: Selection
 
-`
-Ctrl + A            Select all
-Ctrl + Click        Multi-select
-Tab                 Switch panels
-`
+| Shortcut | Action |
+|----------|--------|
+| Ctrl + A | Select all |
+| Ctrl + Click | Multi-select |
+| Tab | Switch panels |
 
 ### :scissors: File Operations
 
-`
-Ctrl + C            Copy
-Ctrl + X            Cut
-Ctrl + V            Paste
-Ctrl + Z            Undo
-Ctrl + Y            Redo
-Delete              Move to Recycle Bin
-Shift + Delete      Permanent delete
-`
+| Shortcut | Action |
+|----------|--------|
+| Ctrl + C | Copy |
+| Ctrl + X | Cut |
+| Ctrl + V | Paste |
+| Ctrl + Z | Undo |
+| Ctrl + Y | Redo |
+| Delete | Move to Recycle Bin |
+| Shift + Delete | Permanent delete |
 
 ### :gear: Other
 
-`
-Ctrl + T            New tab
-Ctrl + Space        Toggle details pane
-Ctrl + W            Close inspector
-Mouse X1/X2         Back/Forward
-`
+| Shortcut | Action |
+|----------|--------|
+| Ctrl + T | New tab |
+| Ctrl + Space | Toggle details pane |
+| Ctrl + W | Close inspector |
+| Mouse X1/X2 | Back/Forward |
 
 ---
 
