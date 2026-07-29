@@ -30,7 +30,7 @@ Download: [https://dqa.vn/devapps/](https://dqa.vn/devapps/)
 
 ## Features
 
-### File Management
+### :file_folder: File Management
 
 - Multi-tab browsing
 - Copy/Cut/Paste with keyboard shortcuts
@@ -40,7 +40,7 @@ Download: [https://dqa.vn/devapps/](https://dqa.vn/devapps/)
 - Quick navigation palette (Ctrl+K)
 - Breadcrumb navigation
 
-### Preview Support
+### :framed_picture: Preview Support
 
 **Images**
 
@@ -70,7 +70,7 @@ Download: [https://dqa.vn/devapps/](https://dqa.vn/devapps/)
 - Font preview (.ttf, .otf, .woff)
 - Code syntax highlighting
 
-### EXR Sequence Player
+### :film_strip: EXR Sequence Player
 
 - Timeline scrubbing
 - Auto-playback with FPS control
@@ -80,14 +80,14 @@ Download: [https://dqa.vn/devapps/](https://dqa.vn/devapps/)
 - GPU-accelerated caching
 - Color eyedropper
 
-### Navigation
+### :compass: Navigation
 
 - Quick Access (Recent, Desktop, Documents, Downloads)
 - All drives with capacity display
 - Cloud storage integration (OneDrive, Google Drive, Dropbox, iCloud)
 - Special folders
 
-### Tools
+### :wrench: Tools
 
 - Space Analyzer - Disk usage visualization
 - Tags - Label files (Deliverable, WIP, Draft, Archived, Warning)
@@ -96,7 +96,7 @@ Download: [https://dqa.vn/devapps/](https://dqa.vn/devapps/)
 - Shell Integration - Windows context menu support
 - Open With - Custom application selection
 
-### Customization
+### :art: Customization
 
 - Themes: Dark, Light, Monochrome
 - Accent color from system
@@ -108,7 +108,7 @@ Download: [https://dqa.vn/devapps/](https://dqa.vn/devapps/)
 
 ## Keyboard Shortcuts
 
-**Navigation**
+### :keyboard: Navigation
 
 `
 Alt + Left/Right    Navigate back/forward
@@ -117,7 +117,7 @@ Ctrl + K            Open palette
 F5                  Refresh
 `
 
-**Selection**
+### :point_up: Selection
 
 `
 Ctrl + A            Select all
@@ -125,7 +125,7 @@ Ctrl + Click        Multi-select
 Tab                 Switch panels
 `
 
-**File Operations**
+### :scissors: File Operations
 
 `
 Ctrl + C            Copy
@@ -137,7 +137,7 @@ Delete              Move to Recycle Bin
 Shift + Delete      Permanent delete
 `
 
-**Other**
+### :gear: Other
 
 `
 Ctrl + T            New tab
@@ -150,14 +150,14 @@ Mouse X1/X2         Back/Forward
 
 ## Tech Stack
 
-**Frontend**
+### :computer: Frontend
 
 - React 19 + TypeScript
 - Vite 6
 - Tailwind CSS
 - Three.js
 
-**Backend**
+### :hammer: Backend
 
 - Tauri 2 (Rust)
 - Windows APIs
@@ -210,33 +210,33 @@ wasm_src/              WASM source code (C++)
 
 | Category | Formats |
 |----------|---------|
-| Images | PNG, JPG, GIF, WebP, TIFF, BMP, TGA, ICO, PSD, AI, EXR |
-| Video | MP4, MOV, AVI, MKV, WebM, M4V, WMV, FLV |
-| 3D | USD, glTF, GLB, FBX, OBJ, STL, PLY, ABC |
-| Documents | PDF, EPUB, TXT, MD, HTML, CSS, JS, JSON, XML, YAML |
-| Audio | MP3, WAV, FLAC, AAC, OGG, M4A, WMA |
-| Archives | ZIP, RAR, 7Z, TAR, GZ |
-| Fonts | TTF, OTF, WOFF, WOFF2, EOT |
+| :bust_in_silhouette: Images | PNG, JPG, GIF, WebP, TIFF, BMP, TGA, ICO, PSD, AI, EXR |
+| :film_projector: Video | MP4, MOV, AVI, MKV, WebM, M4V, WMV, FLV |
+| :package: 3D | USD, glTF, GLB, FBX, OBJ, STL, PLY, ABC |
+| :book: Documents | PDF, EPUB, TXT, MD, HTML, CSS, JS, JSON, XML, YAML |
+| :musical_note: Audio | MP3, WAV, FLAC, AAC, OGG, M4A, WMA |
+| :file_cabinet: Archives | ZIP, RAR, 7Z, TAR, GZ |
+| :capital_abcd: Fonts | TTF, OTF, WOFF, WOFF2, EOT |
 
 ---
 
 ## Getting Started
 
-**Prerequisites**
+### :rocket: Prerequisites
 
 - Node.js 18+
 - Rust 1.70+
 - Windows 10/11
 - WebView2 Runtime
 
-**Development**
+### :construction: Development
 
 \\\ash
 npm install
 npm run tauri dev
 \\\
 
-**Build**
+### :building_construction: Build
 
 \\\ash
 npm run tauri build
