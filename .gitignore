@@ -1,113 +1,44 @@
+# Source code (private)
+src/
+src-tauri/
+
 # Dependencies
 node_modules/
-.pnpm-store/
-.pnpm/
-.modules.yaml
 
 # Build outputs
 dist/
-.vite/
-.vite-temp/
-bundle_dist/
+dist-tauri/
+target/
 
-# Rust build
-src-tauri/target/
-
-# Embedded repos
-emsdk/
-wasm_src/emsdk/
-wasm_src/openexr_src/
-wasm_src/Imath/
-wasm_src/alembic/
-wasm_src/tbb_src/
-wasm_src/cmake/
-wasm_src/bin/
-wasm_src/bazel/
-wasm_src/build_*/
+# WASM build artifacts
 wasm_src/_install/
+wasm_src/build_*/
+wasm_src/bin/
+wasm_src/ninja_*.txt
+wasm_src/em_test.txt
+wasm_src/batch_out.txt
 
-# IDE & local configs
+# WASM SDK
+wasm_src/emsdk/
+wasm_src/tbb_src/
+
+# IDE
+.vscode/
+.idea/
 .cursor/
-agent-tools/
-plans/
-rules/
-.editorconfig
+
+# OS
+.DS_Store
+Thumbs.db
 
 # Logs
 *.log
-build.log
-build_v2.log
-build_v3.log
-cargo_build.log
-tauri-build.log
-tauri-build.err.log
-cargo_err.log
-ewa_debug.log
-batch_out.txt
-em_test.txt
-ninja_out.txt
-ninja_output.txt
-ninja_output_old.txt
+npm-debug.log*
 
-# Backup / temp
-.backups/
-temp_extract/
-openexr_backup_*/
+# Environment
+.env
+.env.local
+.env.*.local
 
-# Debug / temp / test scripts
-Tools/
-scripts/
-cleanup_wabc.py
-check-ports.ps1
-check-tauri.ps1
-kill-tauri.ps1
-*.dump
-dump_abc.html
-dump_standalone.html
-dump_standalone/
-dump_lumi_frame0.cjs
-dump_ply_colors.py
-dump_ply_ref.py
-edit_text.py
-fix_mesh_expanded.py
-fix_ui*.py
-test_aces*.py
-dbg-migrate.py
-
-# Debug artifacts in public
-public/dump_abc.html
-public/dump_standalone.html
-public/wabc_dump.js
-public/wabc_dump.wasm
-public/public/
-
-# External deps
-ffmpeg/
-openexr/
-poppler/
-python/
-luts/
-openexr_backup_*/
-
-# Development docs
-docs/
-
-# WASM source dirs (un-ignore parent, re-add specific subdirs)
-!wasm_src/
-wasm_src/emsdk/
-wasm_src/openexr_src/
-wasm_src/Imath/
-wasm_src/alembic/
-wasm_src/tbb_src/
-wasm_src/cmake/
-wasm_src/bin/
-wasm_src/bazel/
-wasm_src/build_*/
-wasm_src/_install/
-!wasm_src/src/
-!wasm_src/WebAlembicViewer/
-
-# Misc
+# Temp files
 %F%
-*.obj
-build.rs.local
