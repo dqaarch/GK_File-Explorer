@@ -58,10 +58,13 @@ Download: [https://dqa.vn/devapps/](https://dqa.vn/devapps/)
 
 **3D Models**
 
-- USD/USDA/USDC/USDZ
-- glTF/GLB (with Draco)
-- FBX, OBJ, STL, PLY
-- Alembic (ABC) via WebAssembly
+- FBX, OBJ, GLB, GLTF, STL, 3MF, STEP, DAE, 3DS, SKP (Sketchup)
+- USD/USDA/USDC/USDZ (with material X support)
+- PLY, ABC (Alembic animation)
+- Gaussian splats support
+- Bone visualization
+- Camera gizmo (Blender UI style)
+- glTF with Draco compression
 
 **Documents**
 
@@ -197,7 +200,7 @@ src-tauri/
   tauri.conf.json
 
 public/
-  usd-viewer/          Bundled USD viewer
+  usd-viewier/         Bundled USD viewer
   wasm/                WebAssembly modules
   draco/               Draco decoder
 
@@ -212,7 +215,7 @@ wasm_src/              WASM source code (C++)
 |----------|---------|
 | :bust_in_silhouette: Images | PNG, JPG, GIF, WebP, TIFF, BMP, TGA, ICO, PSD, AI, EXR |
 | :film_projector: Video | MP4, MOV, AVI, MKV, WebM, M4V, WMV, FLV |
-| :package: 3D | USD, glTF, GLB, FBX, OBJ, STL, PLY, ABC |
+| :package: 3D | USD, glTF, GLB, FBX, OBJ, STL, 3MF, STEP, DAE, 3DS, SKP, PLY, ABC |
 | :book: Documents | PDF, EPUB, TXT, MD, HTML, CSS, JS, JSON, XML, YAML |
 | :musical_note: Audio | MP3, WAV, FLAC, AAC, OGG, M4A, WMA |
 | :file_cabinet: Archives | ZIP, RAR, 7Z, TAR, GZ |
