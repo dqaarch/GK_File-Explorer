@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html><head><title>test</title></head><body>
+<pre id="o"></pre>
+<script>
+window.onerror = (msg, src, ln, col, err) => {
+  document.getElementById('o').textContent += 'ERR: ' + msg + ' @ ' + src + ':' + ln;
+};
+</script>
+<script src="wabc_dump.js"></script>
+<script>
+const o = document.getElementById('o');
+o.textContent = 'typeof WabcModule = ' + typeof window.WabcModule + '\n';
+o.textContent += 'window.WabcModule = ' + window.WabcModule + '\n';
+o.textContent += 'keys = ' + Object.keys(window).filter(k => k.toLowerCase().includes('abc')).join(',');
+</script>
+</body></html>

@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html><head><title>test2</title></head><body>
+<pre id="o">loading...</pre>
+<script>
+window.addEventListener('error', e => {
+  document.getElementById('o').textContent += '\nERR: ' + e.message + ' @ ' + e.filename + ':' + e.lineno;
+}, true);
+const origErr = console.error;
+console.error = (...a) => { document.getElementById('o').textContent += '\nconsole.error: ' + a.join(' '); origErr.apply(console, a); };
+let Module = null;
+</script>
+<script src="wabc_dump.js"></script>
+<script>
+document.getElementById('o').textContent = 'typeof WabcModule = ' + typeof window.WabcModule;
+document.getElementById('o').textContent += '\nlet Module = ' + typeof Module;
+document.getElementById('o').textContent += '\nkeys: ' + Object.keys(window).filter(k => k.toLowerCase().includes('abc') || k.toLowerCase().includes('module')).join(',');
+</script>
+</body></html>

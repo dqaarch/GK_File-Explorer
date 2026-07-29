@@ -1,0 +1,832 @@
+@import "tailwindcss";
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Windows 11 Fluent UI Color System
+   Based on Fluent Design Tokens
+   
+   NOTE: Main color definitions are in App.tsx <style> tag for proper
+   theme class application. This file contains only component-specific styles.
+═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── GLOBAL APP BACKGROUND (3-layer system) ─────────────────────────────── */
+:root {
+  /* Layer 1: Base app background (everything else) */
+  --app-bg: #191919;
+  --app-bg-rgb: 25, 25, 25; /* RGB values for rgba() transparency */
+  /* Layer 2: Row 1 (addressbar row) + active tab — sits ON TOP of --app-bg */
+  --row-bg: #1f1f1f;
+  /* Layer 3: Addressbar, searchbar, selected files/folders */
+  --surface-bg: #2c2c2c;
+  /* Menu transparency variables */
+  --menu-blur: 20px;
+  --menu-saturate: 160%;
+  --menu-bg-opacity: 1;
+  /* Stroke colors */
+  --stroke-1: rgba(255, 255, 255, 0.1);
+  /* Border colors */
+  --border: rgba(255, 255, 255, 0.1);
+  /* Text colors */
+  --text-primary: rgba(255, 255, 255, 0.9);
+  --text-secondary: rgba(255, 255, 255, 0.6);
+  --text-muted: rgba(255, 255, 255, 0.4);
+  /* Slider track */
+  --slider-track: rgba(255, 255, 255, 0.2);
+  /* Slider thumb - accent color */
+  --thumb-size: 14px;
+  /* ── 3D Viewer Timeline (Play/Reset/scrubber) — theme-aware ── */
+  --timeline-fg: #ffffff;
+  --timeline-fg-muted: rgba(255, 255, 255, 0.5);
+  --timeline-divider: rgba(255, 255, 255, 0.2);
+  --timeline-track: rgba(255, 255, 255, 0.2);
+  --timeline-btn-bg: rgba(255, 255, 255, 0.1);
+  --timeline-btn-bg-hover: rgba(255, 255, 255, 0.2);
+  /* --timeline-thumb intentionally omitted: component uses
+     `var(--accent-from-user, currentColor)` so the slider thumb follows
+     the user's accent color set by App.tsx. */
+}
+
+/* Slider thumb styling - uses inline accent color via JS-set CSS var */
+input[type="range"].slider-thumb-accent::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--accent-from-user, currentColor);
+  cursor: pointer;
+  border: 2px solid white;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+  margin-top: -5px;
+}
+
+input[type="range"].slider-thumb-accent::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--accent-from-user, currentColor);
+  cursor: pointer;
+  border: 2px solid white;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+}
+
+.theme-light {
+  --stroke-1: #858585;
+  --border: rgba(0, 0, 0, 0.1);
+  --text-primary: rgba(0, 0, 0, 0.9);
+  --text-secondary: rgba(0, 0, 0, 0.6);
+  --text-muted: rgba(0, 0, 0, 0.4);
+  --slider-track: rgba(0, 0, 0, 0.2);
+  /* Light overrides for 3D Viewer Timeline */
+  --timeline-fg: #000000;
+  --timeline-fg-muted: rgba(0, 0, 0, 0.5);
+  --timeline-divider: rgba(0, 0, 0, 0.2);
+  --timeline-track: rgba(0, 0, 0, 0.2);
+  --timeline-btn-bg: rgba(0, 0, 0, 0.1);
+  --timeline-btn-bg-hover: rgba(0, 0, 0, 0.2);
+  /* --timeline-thumb inherited from :root scope (intentionally absent here
+     so accent color is the single source of truth for the slider thumb). */
+}
+
+/* ── Light Theme: Address Bar Suggestion Menu ────────────────────────── */
+.theme-light .goku-addr-suggest {
+  background: rgba(255, 255, 255, 0.8) !important;
+  border: 1px solid #c0c0c0 !important;
+}
+.theme-light .goku-addr-suggest button {
+  color: #1c1c1c !important;
+}
+.theme-light .goku-addr-suggest button:hover,
+.theme-light .goku-addr-suggest button.bg-white\/8 {
+  background-color: rgba(0, 0, 0, 0.06) !important;
+  color: #000000 !important;
+}
+.theme-light .goku-addr-suggest button .text-stone-500 {
+  color: #666666 !important;
+}
+.theme-light .goku-addr-suggest button .text-amber-400 {
+  color: #d97706 !important;
+}
+.theme-light .goku-addr-suggest button .text-sky-400 {
+  color: #0284c7 !important;
+}
+
+html, body, #root, .goku-app-root {
+  background-color: var(--app-bg) !important;
+}
+
+/* IMPORTANT: Use a near-transparent but NOT fully transparent background.
+   WebView2 needs this to calculate backdrop-filter blur. 
+   Full transparency (0 alpha) breaks backdrop-filter in production. */
+html {
+  background-color: rgba(var(--app-bg-rgb, 25, 25, 25), 0.001) !important;
+}
+
+body {
+  background-color: var(--app-bg) !important;
+}
+
+#root {
+  background-color: var(--app-bg) !important;
+}
+
+/* Layer 2 utility: target a row with .goku-layer-2 to use --row-bg */
+.goku-layer-2 {
+  background-color: var(--row-bg);
+  transition: background-color 200ms ease;
+}
+
+/* Layer 3 utility: addressbar/searchbar/selected items */
+.goku-layer-3 {
+  background-color: var(--surface-bg);
+  transition: background-color 200ms ease;
+}
+
+/* Selected file/folder highlight uses Layer 3.
+   Stronger specificity than Tailwind's bg-white/bg-stone-* via .goku-layer-3-selected. */
+.goku-layer-3-selected,
+.goku-layer-3-selected.goku-layer-3-selected {
+  background-color: var(--surface-bg) !important;
+  transition: background-color 200ms ease;
+}
+
+/* Code viewer syntax highlighting */
+.code-viewer .hljs {
+  background: transparent;
+  color: var(--fg-2);
+}
+
+.code-viewer .hljs-keyword,
+.code-viewer .hljs-selector-tag,
+.code-viewer .hljs-literal,
+.code-viewer .hljs-section,
+.code-viewer .hljs-link {
+  color: #c084fc;
+}
+
+.code-viewer .hljs-string,
+.code-viewer .hljs-attr,
+.code-viewer .hljs-addition,
+.code-viewer .hljs-template-tag,
+.code-viewer .hljs-template-variable {
+  color: #86efac;
+}
+
+.code-viewer .hljs-number,
+.code-viewer .hljs-symbol,
+.code-viewer .hljs-bullet,
+.code-viewer .hljs-variable,
+.code-viewer .hljs-meta,
+.code-viewer .hljs-meta .hljs-string {
+  color: #fbbf24;
+}
+
+.code-viewer .hljs-title,
+.code-viewer .hljs-title.class_,
+.code-viewer .hljs-title.function_ {
+  color: #7dd3fc;
+}
+
+.code-viewer .hljs-comment,
+.code-viewer .hljs-quote,
+.code-viewer .hljs-deletion {
+  color: var(--fg-3);
+}
+
+.code-viewer .hljs-built_in,
+.code-viewer .hljs-type,
+.code-viewer .hljs-class .hljs-title {
+  color: #f9a8d4;
+}
+
+.code-viewer .hljs-operator,
+.code-viewer .hljs-punctuation {
+  color: var(--fg-2);
+}
+
+/* Marquee selection overlay */
+.marquee-selection-overlay {
+  position: absolute;
+  pointer-events: none;
+  z-index: 9999;
+  border: 2px solid var(--accent-primary);
+  background-color: color-mix(in srgb, var(--accent-primary) 15%, transparent);
+  border-radius: 4px;
+}
+
+.file-item-selectable {
+  /* Selected visuals are driven by existing accentColor/theme helpers */
+}
+
+/* Scrollbar base — force a visible 2px webkit scrollbar on every scrollable
+   surface. Windows 11 WebView2 otherwise falls back to its native overlay
+   scrollbar (which ignores -webkit-scrollbar width). Setting a non-transparent
+   thumb background forces WebView2 to render our custom scrollbar, and the
+   explicit width/height keep it slim. The arrow buttons are hidden via
+   ::-webkit-scrollbar-button so we don't get the up/down chevrons. */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.18) transparent;
+}
+
+::-webkit-scrollbar {
+  width: 6px !important;
+  height: 6px !important;
+  -webkit-appearance: none !important;
+  appearance: none !important;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent !important;
+  -webkit-appearance: none !important;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.18) !important;
+  border-radius: 3px !important;
+  border: none !important;
+  -webkit-appearance: none !important;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.28) !important;
+}
+
+::-webkit-scrollbar-button {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  -webkit-appearance: none !important;
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent !important;
+}
+
+/* ── Fluent UI Menu Styles ────────────────────────────────────────────────── */
+/* Windows 11 style menus with transparency and blur effect */
+.fluent-menu {
+  background: rgba(var(--app-bg-rgb, 25, 25, 25), var(--menu-bg-opacity, 1)) !important;
+  backdrop-filter: blur(var(--menu-blur, 0px)) saturate(var(--menu-saturate, 100%)) !important;
+  -webkit-backdrop-filter: blur(var(--menu-blur, 0px)) saturate(var(--menu-saturate, 100%)) !important;
+  border: 1px solid rgba(255, 255, 255, 0.06) !important;
+  box-shadow: none !important;
+  /* Text colors for dark theme */
+  --fg-1: #ffffff;
+  --fg-2: #a8a8a8;
+  --fg-3: #707070;
+  --stroke-1: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+
+/* Button styles inside fluent-menu - force white text in dark mode */
+.fluent-menu button {
+  color: #ffffff !important;
+  font-size: inherit;
+  padding-top: 0.375rem;
+  padding-bottom: 0.375rem;
+}
+
+.fluent-menu label {
+  color: #ffffff !important;
+  font-size: inherit;
+  padding-top: 0.375rem;
+  padding-bottom: 0.375rem;
+}
+
+/* Light theme - text colors and background for blur effect */
+.theme-light .fluent-menu,
+html.theme-light .fluent-menu,
+[data-theme="light"] .fluent-menu {
+  --fg-1: #000000;
+  --fg-2: #1a1a1a;
+  --fg-3: #4a4a4a;
+  --stroke-1: #a0a0a0;
+  background: rgba(255, 255, 255, var(--menu-bg-opacity, 1)) !important;
+  border: 1px solid #c0c0c0 !important;
+  backdrop-filter: blur(var(--menu-blur, 0px)) saturate(var(--menu-saturate, 100%)) !important;
+  -webkit-backdrop-filter: blur(var(--menu-blur, 0px)) saturate(var(--menu-saturate, 100%)) !important;
+}
+
+/* Override button text color in light theme */
+.theme-light .fluent-menu button,
+.theme-light .fluent-menu label {
+  color: #000000 !important;
+  font-weight: 500;
+}
+
+/* Color picker panel - transparent background like VideoPlayerPreview */
+.fluent-menu.bg-transparent,
+.fluent-menu.color-picker-panel {
+  background: transparent !important;
+  backdrop-filter: blur(8px) saturate(150%) !important;
+  -webkit-backdrop-filter: blur(8px) saturate(150%) !important;
+}
+
+.theme-light .fluent-menu.bg-transparent,
+.theme-light .fluent-menu.color-picker-panel,
+html.theme-light .fluent-menu.bg-transparent,
+html.theme-light .fluent-menu.color-picker-panel {
+  background: rgba(255, 255, 255, 0.85) !important;
+}
+
+.theme-light .theme-aware-header-text,
+.theme-light.theme-aware-header-text {
+  color: #000000 !important;
+}
+
+.theme-light .theme-aware-text-secondary,
+.theme-light.theme-aware-text-secondary {
+  color: #1a1a1a !important;
+}
+
+/* Light theme hover for OCIO menu items (bg-white/5 doesn't show on white bg) */
+.theme-light [data-ocio-menu-root] button:hover,
+.theme-light [data-ocio-menu] button:hover {
+  background-color: rgba(0, 0, 0, 0.08) !important;
+}
+.theme-light.fluent-menu[data-theme="light"],
+html.theme-light .fluent-menu[data-theme="light"],
+.theme-light.fluent-menu,
+.fluent-menu[data-theme="light"] {
+  border: 1px solid #6a6a6a !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06) !important;
+}
+
+/* ── OCIO Dropdown Menu Text Colors (theme-aware) ───────────────────────── */
+/* Dark theme defaults */
+[data-ocio-menu] button,
+[data-ocio-menu] {
+  color: #ffffff;
+}
+
+/* Light theme on the OCIO dropdown itself (applied via className theme-light) */
+[data-ocio-menu].theme-light button,
+[data-ocio-menu].theme-light {
+  color: #000000 !important;
+}
+
+/* Light theme: force black text on white background - highest specificity */
+html.theme-light [data-ocio-menu] button,
+html.theme-light [data-ocio-menu],
+.theme-light [data-ocio-menu] button,
+.theme-light [data-ocio-menu] {
+  color: #000000 !important;
+}
+
+/* Override theme-aware-text-secondary class inside OCIO menu for light theme */
+html.theme-light [data-ocio-menu] button.theme-aware-text-secondary,
+html.theme-light [data-ocio-menu] .theme-aware-text-secondary,
+.theme-light [data-ocio-menu] button.theme-aware-text-secondary,
+.theme-light [data-ocio-menu] .theme-aware-text-secondary {
+  color: #1a1a1a !important;
+}
+
+/* Light theme: hover state for OCIO menu items */
+html.theme-light [data-ocio-menu] button:hover,
+.theme-light [data-ocio-menu] button:hover,
+[data-ocio-menu].theme-light button:hover {
+  background-color: rgba(0, 0, 0, 0.06) !important;
+}
+
+/* Ensure fluent-menu inside OCIO respects light theme */
+.theme-light .fluent-menu[data-ocio-menu],
+html.theme-light .fluent-menu[data-ocio-menu],
+.fluent-menu[data-ocio-menu].theme-light {
+  --fg-1: #000000;
+  --fg-2: #1a1a1a;
+  --fg-3: #4a4a4a;
+}
+
+/* OCIO Light Mode - highest specificity, force black text */
+.ocio-menu-light,
+.ocio-menu-light button,
+.ocio-menu-light span,
+.fluent-menu.ocio-menu-light,
+.fluent-menu.ocio-menu-light button,
+.fluent-menu.ocio-menu-light span {
+  color: #000000 !important;
+  background-color: #ffffff !important;
+}
+
+.ocio-menu-light button:hover,
+.fluent-menu.ocio-menu-light button:hover {
+  background-color: rgba(0, 0, 0, 0.08) !important;
+}
+
+/* OCIO Dark Mode */
+.ocio-menu-dark,
+.ocio-menu-dark button,
+.ocio-menu-dark span,
+.fluent-menu.ocio-menu-dark,
+.fluent-menu.ocio-menu-dark button,
+.fluent-menu.ocio-menu-dark span {
+  color: #ffffff !important;
+}
+
+/* ── Drive Context Menu rows ─────────────────────────────────────────────── */
+/* Match the height rhythm of existing inline context menus (OpenWith submenu
+ * etc.) and keep the hover state subtle so it doesn't fight the fluent-menu
+ * glass surface that already provides the container background. */
+.drive-menu-row {
+  padding: 5px 12px;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.theme-light .drive-menu-row {
+  color: #1a1a1a !important;
+}
+.theme-light .drive-menu-row:hover:not(:disabled) {
+  background-color: rgba(0, 0, 0, 0.08) !important;
+}
+.theme-light .drive-menu-row span {
+  color: #1a1a1a;
+}
+
+/* Light theme hover for explorer context menu items */
+.theme-light .explorer-context-menu button:hover,
+.theme-light .explorer-context-menu > div > button:hover {
+  background-color: rgba(0, 0, 0, 0.08) !important;
+}
+
+/* Force text color for context menus in light theme (portal renders to body) */
+.theme-light .explorer-context-menu {
+  color: rgba(0, 0, 0, 0.9) !important;
+}
+.theme-light .explorer-context-menu button,
+.theme-light .explorer-context-menu span:not([style]) {
+  color: inherit !important;
+}
+
+/* Absolute positioned menus (like header dropdowns) */
+.fluent-menu.absolute {
+  position: absolute !important;
+}
+
+/* Lighter overlay variant for better contrast on dark backgrounds */
+.fluent-menu-light {
+  background: rgba(var(--app-bg-rgb, 25, 25, 25), calc(var(--menu-bg-opacity, 1) * 0.72)) !important;
+  backdrop-filter: blur(var(--menu-blur, 0px)) saturate(var(--menu-saturate, 100%)) !important;
+  -webkit-backdrop-filter: blur(var(--menu-blur, 0px)) saturate(var(--menu-saturate, 100%)) !important;
+}
+
+/* ── System Settings Panel ────────────────────────────────────────────────
+   Same transparent style as fluent-menu so it follows Transparent BG slider */
+.goku-settings-panel {
+  background: rgba(var(--app-bg-rgb, 25, 25, 25), var(--menu-bg-opacity, 1)) !important;
+  backdrop-filter: blur(var(--menu-blur, 0px)) saturate(var(--menu-saturate, 100%)) !important;
+  -webkit-backdrop-filter: blur(var(--menu-blur, 0px)) saturate(var(--menu-saturate, 100%)) !important;
+  border: 1px solid rgba(255, 255, 255, 0.06) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4) !important;
+  --fg-1: #ffffff;
+  --fg-2: #a8a8a8;
+  --fg-3: #707070;
+  --stroke-1: rgba(255, 255, 255, 0.1);
+}
+.goku-settings-panel.theme-light,
+.goku-settings-panel[data-theme="light"] {
+  background: rgba(255, 255, 255, var(--menu-bg-opacity, 1)) !important;
+  border: 1px solid #6a6a6a !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06) !important;
+  --fg-1: #000000;
+  --fg-2: #1a1a1a;
+  --fg-3: #4a4a4a;
+  --stroke-1: #a0a0a0;
+}
+
+/* Settings panel buttons in light theme */
+.goku-settings-panel.theme-light button,
+.goku-settings-panel.theme-light label {
+  color: var(--fg-1, #000000) !important;
+  font-weight: 500;
+}
+
+/* Scrollbar colors per theme - defined in App.tsx for proper cascade */
+
+/* Hide scrollbar utility class */
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Title bar background sits one step darker than the L1 app surface
+   (RGB 17 = #111111 for dark theme, RGB 240 = #f0f0f0 for light theme) so
+   the top window-chrome ribbon reads as a distinct band. The full toolbar
+   underneath keeps the regular L1 background. */
+:root {
+  --app-bg: #191919;
+  --app-bg-rgb: 25, 25, 25;
+  --header-bg: #0a0a0a;
+}
+.goku-titlebar {
+  background-color: var(--header-bg);
+}
+.theme-light .goku-titlebar {
+  background-color: #f0f0f0;
+}
+
+/* Base list-disc fixes */
+.prose-xs {
+  font-size: 11px;
+}
+.prose li {
+  margin-top: 0.125rem;
+  margin-bottom: 0.125rem;
+}
+
+/* Fade-in animation for thumbnails */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.2s ease-out forwards;
+}
+
+/* ── PDF text selection layer ────────────────────────────────────────────── */
+.pdf-text-layer-container {
+  pointer-events: auto;
+  overflow: hidden;
+}
+
+.pdf-text-layer {
+  position: relative;
+  line-height: 1;
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+.pdf-text-layer {
+  color: transparent;
+  user-select: text;
+  -webkit-user-select: text;
+  pointer-events: auto;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  z-index: 2;
+}
+
+.pdf-text-layer span {
+  position: absolute;
+  white-space: pre;
+  color: transparent;
+  pointer-events: auto;
+  transform-origin: top left;
+  cursor: text;
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+.pdf-text-layer ::selection {
+  background: color-mix(in srgb, var(--accent-primary) 35%, transparent);
+  color: transparent;
+}
+
+.pdf-text-layer::-moz-selection {
+  background: color-mix(in srgb, var(--accent-primary) 35%, transparent);
+  color: transparent;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Minimal Vertical Slider (inside View Mode dropdown)
+   direction: ltr + vertical-lr → lower value at TOP, higher value at BOTTOM
+   ════════════════════════════════════════════════════════════════════════════ */
+.view-slider-v-minimal {
+  -webkit-appearance: none;
+  appearance: none;
+  writing-mode: vertical-lr;
+  direction: ltr;
+  width: 8px;
+  height: 170px;
+  background: transparent;
+  cursor: pointer;
+}
+
+/* Compact variant for the context-menu submenu: 7 items × ~33px ≈ 230px.
+   The 196px track height matches the 7 button rows (py-1.5 + icon + text-xs)
+   so the slider visually mirrors the list rather than dwarfing it or
+   looking stubby. */
+.view-slider-v-minimal-compact {
+  -webkit-appearance: none;
+  appearance: none;
+  writing-mode: vertical-lr;
+  direction: ltr;
+  width: 8px;
+  height: 196px;
+  background: transparent;
+  cursor: pointer;
+}
+
+.view-slider-v-minimal-compact::-webkit-slider-runnable-track {
+  width: 3px;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 9999px;
+}
+
+.view-slider-v-minimal-compact::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 9999px;
+  background: var(--accent-primary, #0078d4);
+  border: 2px solid rgba(0, 0, 0, 0.5);
+  cursor: grab;
+  transform: translateX(-5.5px);
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.08), 0 1px 4px rgba(0, 0, 0, 0.5);
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+
+.view-slider-v-minimal-compact::-webkit-slider-thumb:hover {
+  transform: translateX(-5.5px) scale(1.2);
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.12), 0 2px 6px rgba(0, 0, 0, 0.5);
+}
+
+.view-slider-v-minimal-compact::-webkit-slider-thumb:active {
+  cursor: grabbing;
+  transform: translateX(-5.5px) scale(1.1);
+}
+
+.view-slider-v-minimal-compact::-moz-range-track {
+  width: 3px;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 9999px;
+}
+
+.view-slider-v-minimal-compact::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 9999px;
+  background: var(--accent-primary, #0078d4);
+  border: 2px solid rgba(0, 0, 0, 0.5);
+  cursor: grab;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.08), 0 1px 4px rgba(0, 0, 0, 0.5);
+}
+
+.view-slider-v-minimal::-webkit-slider-runnable-track {
+  width: 3px;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 9999px;
+}
+
+.view-slider-v-minimal::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 9999px;
+  background: var(--accent-primary, #0078d4);
+  border: 2px solid rgba(0, 0, 0, 0.5);
+  cursor: grab;
+  transform: translateX(-6px); /* center 16px thumb on 3px track in 8px slider width */
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.08), 0 1px 4px rgba(0, 0, 0, 0.5);
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+
+.view-slider-v-minimal::-webkit-slider-thumb:hover {
+  transform: translateX(-6px) scale(1.2);
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.12), 0 2px 6px rgba(0, 0, 0, 0.5);
+}
+
+.view-slider-v-minimal::-webkit-slider-thumb:active {
+  cursor: grabbing;
+  transform: translateX(-6px) scale(1.1);
+}
+
+.view-slider-v-minimal::-moz-range-track {
+  width: 3px;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 9999px;
+}
+
+.view-slider-v-minimal::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 9999px;
+  background: var(--accent-primary, #0078d4);
+  border: 2px solid rgba(0, 0, 0, 0.5);
+  cursor: grab;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.08), 0 1px 4px rgba(0, 0, 0, 0.5);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   UNIFIED WORKSPACE LAYOUT - CSS-only responsive
+   Prevents preview re-renders by using CSS instead of JS conditional rendering
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Base workspace wrapper */
+.goku-workspace {
+  display: flex;
+  flex-direction: row;
+}
+
+/* Vertical mode: Content area stacks main + details vertically */
+.goku-workspace-vertical {
+  flex-direction: row;
+}
+
+.goku-workspace-vertical .goku-content-area {
+  flex-direction: column;
+}
+
+/* Horizontal mode: Content area stacks main + details horizontally */
+.goku-workspace-horizontal {
+  flex-direction: row;
+}
+
+.goku-workspace-horizontal .goku-content-area {
+  flex-direction: row;
+}
+
+/* Content area wrapper */
+.goku-content-area {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+}
+
+/* Main pane wrapper - takes available space */
+.goku-main-pane-wrapper {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-width: 0;
+  min-height: 0;
+  flex: 1;
+}
+
+/* In vertical mode, main pane takes HALF (50/50 split with details) */
+.goku-workspace-vertical .goku-main-pane-wrapper {
+  flex: 1 1 0%;
+  min-height: 150px; /* Reserve minimum space for main pane */
+}
+
+/* When in vertical mode, main pane should be roughly 50% of content area */
+.goku-main-pane-vertical {
+  flex: 1 1 0%;
+  min-height: 150px;
+}
+
+/* In horizontal mode, main pane is flexible */
+.goku-workspace-horizontal .goku-main-pane-wrapper {
+  flex: 1 1 0%;
+  height: 100%;
+}
+
+/* Details pane wrapper */
+.goku-details-wrapper {
+  overflow: hidden;
+  flex-shrink: 0;
+  /* IMPORTANT: Do NOT use !important here - inline styles control actual size */
+}
+
+/* Vertical mode: Details pane at bottom - height set via inline style */
+.goku-workspace-vertical .goku-details-wrapper {
+  width: 100%;
+  flex-shrink: 0;
+}
+
+/* Horizontal mode: Details pane on the right - width set via inline style */
+.goku-workspace-horizontal .goku-details-wrapper {
+  height: 100%;
+  flex-shrink: 0;
+}
+
+/* Sidebar wrapper - always full height */
+.goku-sidebar-wrapper {
+  flex-shrink: 0;
+  height: 100%;
+}
+
+/* ============================================
+   RESPONSIVE BREAKPOINT SWITCHING
+   The layout mode is controlled by the parent class:
+   - .goku-workspace-vertical = narrow window mode
+   - .goku-workspace-horizontal = wide window mode
+   
+   isDetailsBelow is still computed in JS for:
+   1. Setting dynamic inline styles (height/width)
+   2. Drag handle direction
+   3. Details container sizing
+   
+   But the DOM structure is NOW unified - no more unmount/remount!
+   ============================================ */

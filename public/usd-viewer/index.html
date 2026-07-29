@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>USD Viewer</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, user-scalable=no, viewport-fit=cover" />
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="alternate icon" type="image/x-icon" href="favicon.ico">
+  <meta name="twitter:card" content="summary"/>
+  <meta name="twitter:creator" content="https://autodesk-forks.github.io/USD/ and @hybridherbst"/>
+  <meta property="og:url" content="https://usd-viewer.glitch.me/" />
+  <meta property="og:title" content="USD Viewer" />
+  <meta property="og:description" content="Simple USD Viewer based on Autodesk's USD WASM Fork" />
+  <meta property="og:image" content="https://cdn.glitch.global/bee386a1-31e6-4710-8850-a1d5b7026a09/usd-viewer-preview2.webp?v=1646525510950" />
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <script type="text/javascript" async src="modules/es-module-shims@1.8.0.js"></script>
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "/vendor/three/build/three.module.js",
+        "three/addons/": "/vendor/three/examples/jsm/"
+      }
+    }
+  </script>
+  <script type="module">
+    import { init } from "./index.js";
+
+    init().catch((error) => {
+      console.error(error);
+      const log = document.querySelector("#message-log");
+      if (log) log.textContent = "Initialization failed.";
+    });
+  </script>
+
+  <div id="container" class="viewer-toolbar">
+    <div class="buttons">
+      <label class="toolbar-btn" for="file-input">Upload File</label>
+      <input
+        type="file"
+        id="file-input"
+        style="display:none"
+        multiple
+        accept=".usd,.usda,.usdc,.usdz,.png,.jpg,.jpeg,.tga,.exr,.mtl,.obj"
+      />
+
+      <label class="toolbar-btn" for="folder-input">Upload Folder</label>
+      <input
+        type="file"
+        id="folder-input"
+        style="display:none"
+        multiple
+        webkitdirectory
+        directory
+      />
+
+      <a class="file toolbar-btn" href="?file=/unitree_model/Go2/usd/go2.usd">Load Go2 Model</a>
+      <a class="file toolbar-btn" href="?file=/unitree_model/G1/29dof/usd/g1_29dof_rev_1_0/g1_29dof_rev_1_0.usd">Load G1 29DoF</a>
+      <a class="file toolbar-btn" href="?file=/unitree_model/H1/h1/usd/h1.usd">Load H1</a>
+      <button id="export-roundtrip-usd" class="toolbar-btn" type="button">Export Roundtrip USD</button>
+
+      <label class="toggle-option" for="toggle-visuals">
+        <input type="checkbox" id="toggle-visuals" />
+        Show Visual Meshes
+      </label>
+
+      <label class="toggle-option" for="toggle-collisions">
+        <input type="checkbox" id="toggle-collisions" />
+        Show Collisions
+      </label>
+
+      <label class="toggle-option" for="toggle-link-dynamics">
+        <input type="checkbox" id="toggle-link-dynamics" />
+        Show COM &amp; Inertia
+      </label>
+
+      <span class="filename"></span>
+    </div>
+
+    <p id="message-log">Waiting for initialization to start...</p>
+    <div id="loading-bar-container">
+      <div id="loading-bar"></div>
+      <span id="loading-percent">0%</span>
+    </div>
+  </div>
+
+  <div id="joint-panel" class="joint-panel" style="display:none">
+    <div id="joint-panel-header" class="joint-panel-header">Joint Panel</div>
+    <div id="joint-panel-list" class="joint-panel-list"></div>
+  </div>
+</body>
+</html>

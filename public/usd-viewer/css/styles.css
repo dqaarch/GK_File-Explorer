@@ -1,0 +1,395 @@
+:root {
+  --color-bg-0: rgb(255, 255, 255);
+  --color-bg-1: hsl(209, 36%, 86%);
+  --color-bg-2: hsl(224, 44%, 95%);
+  --color-theme-1: #000000;
+  --color-theme-2: #4075a6;
+  --color-text: rgba(23, 22, 22, 0.7);
+  --font-ui: "Space Grotesk", "Noto Sans SC", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  --toolbar-bg: rgba(15, 23, 42, 0.84);
+  --toolbar-border: rgba(148, 163, 184, 0.34);
+  --toolbar-text: rgba(241, 245, 249, 0.95);
+  --toolbar-muted: rgba(203, 213, 225, 0.82);
+  --toolbar-btn-bg: rgba(15, 23, 42, 0.46);
+  --toolbar-btn-bg-hover: rgba(56, 189, 248, 0.24);
+  --toolbar-btn-border: rgba(125, 211, 252, 0.42);
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-ui);
+  min-height: 100vh;
+  background-attachment: fixed;
+  background-color: var(--color-bg-1);
+  background-image: linear-gradient(180deg, var(--color-bg-0) 0%, var(--color-bg-1) 15%, var(--color-bg-2) 50%);
+}
+
+body[data-one-shot-loading="1"] canvas {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+body[data-one-shot-loading="1"] #container .buttons,
+body[data-one-shot-loading="1"] #joint-panel,
+body[data-one-shot-loading="1"] .robot-panel {
+  display: none !important;
+}
+
+.footer {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  margin-bottom:15px;
+}
+
+#message-log {
+  opacity: 0.9;
+  font-size: 12px;
+  color: var(--toolbar-muted);
+  margin-left: 2px;
+  margin-bottom: 0;
+  margin-top: 4px;
+  font-style: italic;
+}
+
+#loading-bar-container {
+  display: none;
+  position: relative;
+  width: min(320px, calc(100vw - 44px));
+  height: 16px;
+  background-color: rgba(15, 23, 42, 0.58);
+  border-radius: 8px;
+  margin: 8px 0 2px;
+  overflow: hidden;
+}
+
+#loading-bar {
+  width: 0%;
+  height: 100%;
+  background-color: var(--color-theme-2);
+  transition: width 0.2s ease-out;
+}
+
+#loading-percent {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1;
+  pointer-events: none;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.55);
+  font-variant-numeric: tabular-nums;
+}
+
+.viewer-toolbar {
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  right: auto;
+  z-index: 22;
+  width: min(1240px, calc(100vw - 24px));
+  padding: 10px 12px 10px;
+  border-radius: 14px;
+  border: 1px solid var(--toolbar-border);
+  background: linear-gradient(
+    128deg,
+    rgba(15, 23, 42, 0.86) 0%,
+    rgba(30, 41, 59, 0.82) 48%,
+    rgba(12, 74, 110, 0.7) 100%
+  );
+  box-shadow: 0 10px 26px rgba(2, 6, 23, 0.28);
+  backdrop-filter: blur(6px);
+  color: var(--toolbar-text);
+  font-size: 13px;
+}
+
+#container .buttons {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  flex-direction: row;
+  gap: 8px;
+}
+
+#container .toggle-option {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(15, 23, 42, 0.52);
+  color: var(--toolbar-text);
+  border: 1px solid rgba(148, 163, 184, 0.42);
+  padding: 6px 11px;
+  border-radius: 999px;
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+#container .toggle-option input {
+  margin: 0;
+  accent-color: #38bdf8;
+}
+
+#container .toggle-option:hover {
+  background: rgba(56, 189, 248, 0.2);
+  border-color: rgba(125, 211, 252, 0.62);
+}
+
+#container .toolbar-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 33px;
+  padding: 0 13px;
+  border-radius: 999px;
+  border: 1px solid var(--toolbar-btn-border);
+  background: var(--toolbar-btn-bg);
+  color: var(--toolbar-text);
+  cursor: pointer;
+  text-decoration: none;
+  white-space: nowrap;
+  font-size: 12.5px;
+  font-weight: 540;
+  letter-spacing: 0.015em;
+  user-select: none;
+  transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+
+#container .toolbar-btn:hover {
+  background: var(--toolbar-btn-bg-hover);
+  border-color: rgba(125, 211, 252, 0.72);
+  transform: translateY(-1px);
+}
+
+#container a span {
+  font-size: 0.8em;
+  opacity: 0.8;
+}
+
+#container .filename {
+  margin-left: 6px;
+  color: var(--toolbar-muted);
+  max-width: min(460px, 60vw);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.joint-panel {
+  position: fixed;
+  right: 12px;
+  top: 68px;
+  width: 320px;
+  max-width: calc(100vw - 24px);
+  background: rgba(10, 10, 10, 0.72);
+  color: #f0f0f0;
+  border-radius: 10px;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(4px);
+  z-index: 20;
+}
+
+.robot-panel {
+  position: fixed;
+  left: 12px;
+  top: 68px;
+  width: min(58vw, 860px);
+  max-width: calc(100vw - 24px);
+  background: rgba(10, 10, 10, 0.78);
+  color: #f0f0f0;
+  border-radius: 10px;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.28);
+  backdrop-filter: blur(4px);
+  z-index: 18;
+}
+
+.joint-panel-header {
+  padding: 8px 10px;
+  font-size: 13px;
+  font-weight: 600;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.16);
+  cursor: move;
+  user-select: none;
+}
+
+.robot-panel-header {
+  padding: 8px 10px;
+  font-size: 13px;
+  font-weight: 600;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.16);
+  cursor: move;
+  user-select: none;
+}
+
+.joint-panel-list {
+  max-height: min(62vh, 560px);
+  overflow: auto;
+  padding: 8px;
+}
+
+.robot-panel-list {
+  max-height: min(62vh, 560px);
+  overflow: auto;
+  padding: 8px;
+}
+
+.joint-panel-status {
+  opacity: 0.8;
+  font-size: 12px;
+  padding: 8px 4px;
+}
+
+.robot-panel-status {
+  opacity: 0.8;
+  font-size: 12px;
+  padding: 8px 4px;
+}
+
+.robot-panel-summary {
+  padding: 8px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.robot-panel-title {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.robot-panel-subtitle {
+  margin-top: 2px;
+  opacity: 0.78;
+  font-size: 12px;
+}
+
+.robot-panel-metrics {
+  margin-top: 4px;
+  opacity: 0.92;
+  font-size: 12px;
+}
+
+.robot-panel-section-title {
+  margin-top: 10px;
+  margin-bottom: 6px;
+  padding-left: 2px;
+  opacity: 0.9;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.robot-panel-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11px;
+}
+
+.robot-panel-table thead th {
+  text-align: left;
+  position: sticky;
+  top: 0;
+  background: rgba(12, 12, 12, 0.95);
+  z-index: 1;
+}
+
+.robot-panel-table th,
+.robot-panel-table td {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 4px 6px;
+  vertical-align: top;
+}
+
+.robot-panel-cell-link {
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.robot-panel-overflow {
+  opacity: 0.76;
+  font-style: italic;
+}
+
+.joint-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-rows: auto auto;
+  gap: 4px 8px;
+  padding: 8px 6px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.joint-row + .joint-row {
+  margin-top: 8px;
+}
+
+.joint-row-title {
+  font-size: 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.joint-row-value {
+  font-size: 12px;
+  opacity: 0.9;
+}
+
+.joint-row-slider {
+  grid-column: 1 / span 2;
+  width: 100%;
+  margin: 0;
+}
+
+.have-custom-file a.file.hide {
+  display: none;
+}
+
+@media (max-width: 980px) {
+  .viewer-toolbar {
+    width: calc(100vw - 18px);
+    left: 9px;
+    top: 9px;
+    padding: 10px;
+  }
+
+  #container .buttons {
+    gap: 6px;
+  }
+
+  #container .toolbar-btn,
+  #container .toggle-option {
+    min-height: 31px;
+    padding: 0 10px;
+    font-size: 12px;
+  }
+
+  #container .filename {
+    max-width: calc(100vw - 34px);
+    margin-top: 2px;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+      --color-bg-0: rgb(23, 22, 22);
+      --color-bg-1: hsl(209, 36%, 16%);
+      --color-bg-2: hsl(224, 44%, 5%);
+      --color-theme-1: #ffffff;
+      --color-theme-2: #4075a6;
+      --color-text: rgba(255, 255, 255, 0.7);
+      --toolbar-bg: rgba(3, 7, 18, 0.84);
+      --toolbar-border: rgba(148, 163, 184, 0.32);
+      --toolbar-text: rgba(241, 245, 249, 0.95);
+      --toolbar-muted: rgba(203, 213, 225, 0.8);
+      --toolbar-btn-bg: rgba(15, 23, 42, 0.52);
+      --toolbar-btn-bg-hover: rgba(8, 145, 178, 0.28);
+      --toolbar-btn-border: rgba(94, 234, 212, 0.34);
+  }
+}

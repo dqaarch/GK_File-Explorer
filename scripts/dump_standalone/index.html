@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>WABC Standalone Dump - Compare with i-saint</title>
+<style>
+body { font-family: monospace; margin: 20px; background: #1a1a1a; color: #e0e0e0; }
+h1 { color: #6cf; }
+.note { color: #fa3; background: #332; padding: 10px; border-left: 4px solid #fa3; margin: 10px 0; }
+.file-input { background: #222; padding: 15px; border: 2px dashed #6cf; margin: 15px 0; }
+#output { background: #000; color: #0f0; padding: 15px; white-space: pre-wrap; font-size: 13px; max-height: 80vh; overflow: auto; border: 1px solid #333; }
+button { background: #6cf; color: #000; border: 0; padding: 10px 20px; font-weight: bold; cursor: pointer; margin: 10px 5px; }
+button:hover { background: #8df; }
+button:disabled { background: #555; cursor: not-allowed; }
+.file-name { color: #6f6; font-weight: bold; }
+.file-size { color: #aaa; }
+</style>
+</head>
+<body>
+<h1>WABC Standalone Dump</h1>
+<div class="note">
+This is a standalone diagnostic tool that loads the SAME wasm (wabc.wasm) that the app uses,
+but in a vanilla Chrome browser. Open this file directly in Chrome (double-click), then
+select your .abc file. The output below shows what the underlying wabc library returns.
+
+Compare this output with what the app logs in WabcLoader.ts to see whether the app reads
+data correctly OR whether the issue is in the wabc library / i-saint's SceneABC.
+</div>
+
+<div class="file-input">
+<h3>1. Select your .abc file:</h3>
+<input type="file" id="fileInput" accept=".abc">
+<button id="loadBtn" disabled>Load & Dump</button>
+<div id="fileInfo"></div>
+</div>
+
+<h3>2. Output (also in DevTools console):</h3>
+<div id="output">Ready. Select a .abc file and click "Load & Dump".</div>
+
+<script>
+const output = document.getElementById('output');
+const fileInput = document.getElementById('fileInput');
+const loadBtn = document.getElementById('loadBtn');
+const fileInfo = document.getElementById('fileInfo');
+let selectedFile = null;
+
+fileInput.addEventListener('change', () => {
+  selectedFile = fileInput.files[0];
+  if (selectedFile) {
+    fileInfo.innerHTML = `<span class="file-name">${selectedFile.name}</span> <span class="file-size">(${selectedFile.size.toLocaleString()} bytes)</span>`;
+    loadBtn.disabled = false;
+  }
+});
+
+function log(s) {
+  output.textContent += '\n' + s;
+  console.log(s);
+}
+
+window.addEventListener('error', (e) => log('[WIN ERROR] ' + e.message + ' @ ' + e.filename + ':' + e.lineno));
+window.addEventListener('unhandledrejection', (e) => log('[PROMISE ERROR] ' + e.reason));
+
+log('[SETUP] Loading wabc_dump.js...');
+</script>
+<script src="wabc_dump.js"></script>
+<script>
+// Catch errors during script load
+window.__wabcScriptError = null;
+window.addEventListener('error', (e) => {
+  log('[GLOBAL ERROR] ' + e.message + ' @ ' + e.filename + ':' + e.lineno + ':' + e.colno);
+  window.__wabcScriptError = e;
+}, true);
+
+// Patch console.error
+const origErr = console.error;
+console.error = (...args) => {
+  log('[console.error] ' + args.join(' '));
+  origErr.apply(console, args);
+};
+
+let Module = null;
+
+async function loadModule() {
+  // wabc_dump.js sets up window.WabcModule as a Promise/function
+  log('[SETUP] typeof WabcModule = ' + typeof window.WabcModule);
+  log('[SETUP] window keys containing "abc" or "module": ' + Object.keys(window).filter(k => k.toLowerCase().includes('abc') || k.toLowerCase().includes('module')).join(', '));
+  if (typeof window.WabcModule === 'function') {
+    log('[SETUP] Calling WabcModule() factory...');
+    try {
+      Module = await window.WabcModule();
+    } catch (e) {
+      log('[SETUP] WabcModule() threw: ' + e.message + '\n' + e.stack);
+      throw e;
+    }
+  } else if (window.WabcModule instanceof Promise) {
+    log('[SETUP] Awaiting WabcModule Promise...');
+    Module = await window.WabcModule;
+  } else if (window.WabcModule) {
+    Module = window.WabcModule;
+  } else {
+    throw new Error('WabcModule not found on window (typeof = ' + typeof window.WabcModule + ')');
+  }
+  log('[SETUP] Module loaded. cwrap=' + typeof Module.cwrap + ' FS=' + typeof Module.FS + ' _malloc=' + typeof Module._malloc);
+  log('[SETUP] Module keys: ' + Object.keys(Module).filter(k => /^(F|FS|cwrap|_|_malloc|_free|HEAP)/i.test(k)).join(','));
+}
+
+async function dump(file) {
+  log('');
+  log('===================================================================');
+  log('[DUMP] Loading file: ' + file.name);
+  log('[DUMP] File size: ' + file.size + ' bytes');
+  log('===================================================================');
+
+  const abcBytes = new Uint8Array(await file.arrayBuffer());
+  log('[DUMP] Read ' + abcBytes.length + ' bytes into Uint8Array');
+
+  // Write to wasm virtual FS - use direct API instead of FS helper
+  log('[DUMP] Module keys available: ' + Object.keys(Module).filter(k => typeof Module[k] === 'function').slice(0, 30).join(', '));
+  // Emscripten exposes _malloc + cwrap; use FS_createDataFile or write bytes via FS.writeFile
+  if (typeof Module.FS === 'undefined') {
+    log('[DUMP] WARN: Module.FS undefined, trying FS_createDataFile from internal scope');
+    // Some builds expose FS via FS_createDataFile wrapper
+    // Try using the global FS via a workaround: write to a blob URL and fetch via fs
+    // Actually, in modern emscripten FS is initialized lazily; we should be able to get it
+    // through a sync write helper. Fall back: read abc via DataView manually
+  }
+  try {
+    Module.FS.writeFile('/input.abc', abcBytes);
+    log('[DUMP] Wrote to wasm FS at /input.abc');
+  } catch (e) {
+    log('[DUMP] FS.writeFile failed: ' + e.message + ', trying direct path mount');
+    // Try creating via FS_createDataFile
+    Module['FS_createDataFile']?.('.', 'input.abc', abcBytes, true, false);
+    log('[DUMP] Wrote via FS_createDataFile');
+  }
+
+  // Wrap all needed functions
+  const wabcOpenBuffer = Module.cwrap('wabc_open_buffer', 'number', ['string']);
+  const wabcClose = Module.cwrap('wabc_close', 'number', ['number']);
+  const wabcGetStartTime = Module.cwrap('wabc_get_start_time', 'number', ['number']);
+  const wabcGetEndTime = Module.cwrap('wabc_get_end_time', 'number', ['number']);
+  const wabcSeek = Module.cwrap('wabc_seek', 'number', ['number', 'number']);
+  const wabcGetNumVertices = Module.cwrap('wabc_get_num_vertices', 'number', ['number']);
+  const wabcGetNumFaces = Module.cwrap('wabc_get_num_faces', 'number', ['number']);
+  const wabcGetNumExpandedVertices = Module.cwrap('wabc_get_num_expanded_vertices', 'number', ['number']);
+  const wabcGetNumPoints = Module.cwrap('wabc_get_num_points', 'number', ['number']);
+  const wabcGetNumCameras = Module.cwrap('wabc_get_num_cameras', 'number', ['number']);
+  const wabcReadExpandedVertices = Module.cwrap('wabc_read_expanded_vertices', 'number', ['number', 'number', 'number']);
+  const wabcDumpMeshStats = Module.cwrap('wabc_dump_mesh_stats', null, ['number', 'number']);
+
+  // Open archive
+  log('[DUMP] Calling wabc_open_buffer("/input.abc")...');
+  const handle = wabcOpenBuffer('/input.abc');
+  log('[DUMP] Handle = ' + handle);
+  if (handle < 0) {
+    log('[DUMP] FAILED to open archive');
+    return;
+  }
+
+  // Time range
+  const t0 = wabcGetStartTime(handle);
+  const t1 = wabcGetEndTime(handle);
+  log('[DUMP] Time range: [' + t0.toFixed(4) + ', ' + t1.toFixed(4) + ']');
+
+  // Counts BEFORE seek
+  const indexedVertsBefore = wabcGetNumVertices(handle);
+  const indexedFacesBefore = wabcGetNumFaces(handle);
+  const expandedBefore = wabcGetNumExpandedVertices(handle);
+  const pointsBefore = wabcGetNumPoints(handle);
+  const camsBefore = wabcGetNumCameras(handle);
+  log('[DUMP] BEFORE seek(0):');
+  log('  indexedVerts = ' + indexedVertsBefore);
+  log('  indexedFaces = ' + indexedFacesBefore);
+  log('  expanded     = ' + expandedBefore);
+  log('  points       = ' + pointsBefore);
+  log('  cameras      = ' + camsBefore);
+
+  // Seek to start of animation
+  log('[DUMP] Calling wabc_seek(' + t0.toFixed(4) + ')...');
+  wabcSeek(handle, t0);
+
+  // Counts AFTER seek
+  const indexedVerts = wabcGetNumVertices(handle);
+  const indexedFaces = wabcGetNumFaces(handle);
+  const expanded = wabcGetNumExpandedVertices(handle);
+  log('[DUMP] AFTER seek(0):');
+  log('  indexedVerts = ' + indexedVerts);
+  log('  indexedFaces = ' + indexedFaces);
+  log('  expanded     = ' + expanded);
+  log('  ratio expanded/indexed = ' + (expanded / Math.max(1, indexedVerts)).toFixed(2) + 'x');
+
+  // Dump first 6 verts via existing wabc_dump_positions (prints via printf -> captured in console)
+  log('[DUMP] Calling wabc_dump_positions(handle, 6) for raw output...');
+  const wabcDumpPositions = Module.cwrap('wabc_dump_positions', null, ['number', 'number']);
+  wabcDumpPositions(handle, 6);
+
+  // Dump verts at various offsets to detect if data has gaps or shifts
+  log('[DUMP] Calling wabc_dump_positions(handle, N) at various offsets (8, 100, 1000, 100000, 1M):');
+  // Dump at offset 0 (already done above) — now we use a different approach: just inspect what's in heap
+  // We'll allocate, copy, and read offsets 0, 8, 100, 1000, 100000, 1M, 5M, end
+
+  // Just do extra wabc_dump_positions - but it always reads from start. Instead, do heap reads.
+  // Allocate big buffer
+  const sampleOffsets = [0, 1, 2, 3, 4, 5, 8, 100, 1000, 100000, 1000000, 5000000, 10000000];
+  // Use wabcDumpPositions multiple times at decreasing sizes - no, it dumps positions[0..N-1]
+  // Let me write a custom function that takes a byte offset
+
+  // Skip — wabc_dump_positions already showed first 6 in C++. Let's read heap directly using
+  // wabcReadExpandedVertices + careful offsets.
+
+  // Compute centroid, bbox, degenerate count - delegated to C++ via wabc_dump_mesh_stats
+  // (its printf output is captured by puppeteer console listener)
+  // Use sampleStride=0 for FULL scan (vs default which samples 2000 verts)
+  log('[DUMP] Calling wabc_dump_mesh_stats(handle, 0) [FULL SCAN]...');
+  wabcDumpMeshStats(handle, 0);
+  log('[DUMP] Calling wabc_dump_mesh_stats(handle, 5537) [SAMPLED, 2000 verts]...');
+  wabcDumpMeshStats(handle, 5537);
+
+  // EXTRA: dump positions at varied offsets to detect data shifts
+  log('[DUMP] Sample verts at strategic offsets (every 1M verts):');
+  const wabcDumpPositionsBig = Module.cwrap('wabc_dump_positions', null, ['number', 'number']);
+  // wabc_dump_positions dumps positions[0..N-1]. To see verts at offset N, we'd need a different function.
+  // Instead, allocate big buffer and read whole mesh into JS, then sample at offsets.
+  const totalFloats = expanded * 3;
+  const totalBytes = totalFloats * 4;
+  log('[DUMP] Allocating ' + (totalBytes/1024/1024).toFixed(1) + ' MB heap buffer...');
+  const bigBuf = Module._malloc(totalBytes);
+  log('[DUMP] Reading ALL expanded verts into bigBuf...');
+  const startMs = performance.now();
+  const wabcReadExVertsForSample = Module.cwrap('wabc_read_expanded_vertices', 'number', ['number', 'number', 'number']);
+  const nWritten = wabcReadExVertsForSample(handle, bigBuf, totalFloats);
+  log('[DUMP] Read ' + nWritten + ' floats in ' + (performance.now()-startMs).toFixed(0) + ' ms');
+
+  // Now read via JS using same functions the app uses
+  log('[DUMP] Reading via JS (mimics app WabcLoader.ts)...');
+  const wabcGetNumExVertsJS = Module.cwrap('wabc_get_num_expanded_vertices', 'number', ['number']);
+  const expandedFromJS = wabcGetNumExVertsJS(handle);
+  log('[DUMP] JS get_num_expanded_vertices returned: ' + expandedFromJS);
+
+  // _malloc returns byte offset. Module._malloc is exported.
+  const maxFloats = expandedFromJS * 3;
+  const memBuf = Module._malloc(maxFloats * 4);
+  log('[DUMP] JS _malloc got byte offset = ' + memBuf);
+  log('[DUMP] memBuf / 4 = ' + (memBuf >> 2) + ' (should be integer)');
+  const n2 = wabcReadExVertsForSample(handle, memBuf, maxFloats);
+  log('[DUMP] JS wabc_read_expanded_vertices wrote ' + n2 + ' floats');
+
+  // Read first 10 verts using FLOAT view (mimics app's m.HEAPF32.subarray)
+  // Module may not export HEAPU8/HEAPF32 directly; define views like the app does
+  log('[DUMP] Module.wasmMemory = ' + typeof Module.wasmMemory + ', Module.HEAPU8 = ' + typeof Module.HEAPU8);
+  let _mem = null;
+  if (Module.wasmMemory && Module.wasmMemory.buffer) {
+    _mem = Module.wasmMemory.buffer;
+  } else if (Module.HEAPU8 && Module.HEAPU8.buffer) {
+    _mem = Module.HEAPU8.buffer;
+  } else {
+    // Try via WabcModule closure: wasmMemory is exported in C ABI exports map
+    if (window.__wabcMemoryDebug) {
+      _mem = window.__wabcMemoryDebug.buffer;
+    }
+  }
+  if (!_mem) {
+    log('[DUMP] ERROR: Cannot resolve wasm memory buffer for heap reads.');
+  } else {
+    const HEAPF32VIEW_LOCAL = new Float32Array(_mem);
+    const f32Idx = memBuf >> 2;
+    log('[DUMP] JS Float32 view first 10 verts (mimics m.HEAPF32.subarray):');
+    for (let i = 0; i < 10; i++) {
+      log('  vert[' + i + '] X=' + HEAPF32VIEW_LOCAL[f32Idx + i*3].toFixed(4) + ' Y=' + HEAPF32VIEW_LOCAL[f32Idx + i*3+1].toFixed(4) + ' Z=' + HEAPF32VIEW_LOCAL[f32Idx + i*3+2].toFixed(4));
+    }
+
+    // Read same positions using DataView + byteOffset (alternative read)
+    const dv = new DataView(_mem, memBuf, maxFloats * 4);
+    log('[DUMP] DataView read of first 10 verts (alternative path):');
+    for (let i = 0; i < 10; i++) {
+      log('  vert[' + i + '] X=' + dv.getFloat32(i*12, true).toFixed(4) + ' Y=' + dv.getFloat32(i*12+4, true).toFixed(4) + ' Z=' + dv.getFloat32(i*12+8, true).toFixed(4));
+    }
+  }
+
+  Module._free(bigBuf);
+  Module._free(memBuf);
+  log('[DUMP] Done.');
+
+  wabcClose(handle);
+
+  log('');
+  log('===================================================================');
+  log('[DONE] Compare the above numbers with WabcLoader.ts logs:');
+  log('  - expanded/indexed ratio should be ~ 3-10x for typical abc');
+  log('  - BBox size should be ~ 100s of units for a human character');
+  log('  - degenerate % should be < 5%');
+  log('===================================================================');
+}
+
+loadBtn.addEventListener('click', async () => {
+  if (!selectedFile) return;
+  loadBtn.disabled = true;
+  output.textContent = '';
+  try {
+    await dump(selectedFile);
+  } catch (e) {
+    log('[ERROR] ' + e.message + '\n' + e.stack);
+  } finally {
+    loadBtn.disabled = false;
+  }
+});
+
+(async () => {
+  try {
+    await loadModule();
+    log('[READY] Click "Load & Dump" to dump a .abc file');
+  } catch (e) {
+    log('[SETUP ERROR] ' + e.message + '\n' + e.stack);
+  }
+})();
+</script>
+</body>
+</html>

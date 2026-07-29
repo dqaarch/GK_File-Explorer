@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html><head><title>test3</title></head><body>
+<pre id="o">starting...</pre>
+<script>
+window.addEventListener('error', e => {
+  document.getElementById('o').textContent += '\nwindow.onerror: ' + e.message + ' @ ' + e.filename + ':' + e.lineno + ':' + e.colno;
+}, true);
+let Module = null;
+console.error_orig = console.error;
+console.error = function(...args) {
+  document.getElementById('o').textContent += '\nconsole.error called with: ' + args.map(a => typeof a === 'string' ? a : JSON.stringify(a)).join(' ');
+  console.error_orig.apply(console, args);
+};
+const log = (s) => {
+  document.getElementById('o').textContent += '\n' + s;
+};
+log('start of inline1');
+</script>
+<script src="wabc_dump.js"></script>
+<script>
+log('typeof WabcModule = ' + typeof window.WabcModule);
+log('keys: ' + Object.keys(window).filter(k => k.toLowerCase().includes('abc') || k.toLowerCase().includes('module')).join(','));
+</script>
+</body></html>
