@@ -220,30 +220,6 @@ wasm_src/              WASM source code (C++)
 
 ---
 
-## Getting Started
-
-### :rocket: Prerequisites
-
-- Node.js 18+
-- Rust 1.70+
-- Windows 10/11
-- WebView2 Runtime
-
-### :construction: Development
-
-\\\ash
-npm install
-npm run tauri dev
-\\\
-
-### :building_construction: Build
-
-\\\ash
-npm run tauri build
-\\\
-
----
-
 ## License
 
 MIT License
